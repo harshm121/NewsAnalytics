@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="java.util.Date"/>
+<fullyQualifiedTypeName name="java.util.Calendar"/>
+<fullyQualifiedTypeName name="Backend.parser_0"/>
+<fullyQualifiedTypeName name="Backend.ProjectFile"/>
+<fullyQualifiedTypeName name="Backend.QueryDetails"/>
+<fullyQualifiedTypeName name="java.util.Iterator"/>
+<fullyQualifiedTypeName name="java.nio.file.Files"/>
+<fullyQualifiedTypeName name="UI.QueryInputPanel"/>
+<fullyQualifiedTypeName name="java.lang.String"/>
+<fullyQualifiedTypeName name="Backend.SearchCompleteException"/>
+<fullyQualifiedTypeName name="Backend.AlreadyExistsException"/>
+<fullyQualifiedTypeName name="UI.NewProjectDialog"/>
+<fullyQualifiedTypeName name="java.awt.event.WindowFocusListener"/>
+<fullyQualifiedTypeName name="java.awt.event.WindowListener"/>
+<fullyQualifiedTypeName name="java.awt.Desktop"/>
+<fullyQualifiedTypeName name="java.io.FileWriter"/>
+<fullyQualifiedTypeName name="java.io.BufferedWriter"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
+<fullyQualifiedTypeName name="javax.swing.PopupFactory"/>
+<fullyQualifiedTypeName name="javax.swing.Popup"/>
+<fullyQualifiedTypeName name="javax.swing.JToolTip"/>
+<fullyQualifiedTypeName name="javax.swing.ToolTipManager"/>
+<fullyQualifiedTypeName name="java.awt.event.ActionListener"/>
+<fullyQualifiedTypeName name="UI.GoogleConfigurationFrame"/>
+<fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="Backend.GoogleConfig"/>
+<fullyQualifiedTypeName name="javax.swing.JFrame"/>
+<fullyQualifiedTypeName name="java.io.Serializable"/>
+<fullyQualifiedTypeName name="Backend.main"/>
+<fullyQualifiedTypeName name="UI.ProxyConfig"/>
+<fullyQualifiedTypeName name="Backend.proxy"/>
+<fullyQualifiedTypeName name="java.util.Collections"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="java.nio.file.Path"/>
+<fullyQualifiedTypeName name="java.io.FileOutputStream"/>
+<fullyQualifiedTypeName name="java.io.PrintStream"/>
+<fullyQualifiedTypeName name="java.net.URL"/>
+<fullyQualifiedTypeName name="java.io.File"/>
+<fullyQualifiedTypeName name="UI.Constants"/>
+</qualifiedTypeNameHistroy>

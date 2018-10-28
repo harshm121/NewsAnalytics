@@ -1,0 +1,594 @@
+package UI;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Window;
+import java.awt.Window.Type;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.Console;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JWindow;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
+
+import Backend.main;
+import edu.stanford.nlp.util.CollectionFactory.ArrayListFactory;
+import jaco.swing.autocomplete.Autocomplete;
+
+import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
+
+public class FirstScreen extends JFrame {
+	private static JTextField textField;
+	private static JTextField textField_1;
+	private static JTextField textField_2;
+	public static JPanel panel;
+	public static JLabel lblInternetStatus;
+	//public static GraphsPanel graphsPanel;
+	public String savedProxyHost;
+	public String savedProxyPort;	
+	public static FirstScreen frame;
+	static JPanel loadingPanel;
+	LinkedList<String> entries = new LinkedList<String>();
+	public File userDirectory;
+	public static String startDate;
+	public static String endDate;
+	public ProjectClass project;
+	public QueryClass currentQuery;
+	
+//	public static void main(String[] args) {
+//		SplashScreen s=new SplashScreen();
+//        s.setVisible(true);
+//        Thread t=Thread.currentThread();
+//        try {
+//        	t.sleep(5000);
+//		} catch (InterruptedException e1) {
+//			e1.printStackTrace();
+//		}
+//        s.dispose();
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					frame = new FirstScreen();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
+
+	/**
+	 * Create the frame.
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 */
+	public FirstScreen(ProjectClass proj) throws ClassNotFoundException, IOException {
+		frame=this;
+		project=proj;
+		setType(Type.NORMAL);
+		setTitle("NewsStory Lifeline - "+project.projectName);
+		setResizable(false);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setBounds(300, 100, 696, 609);
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(null, "Are you sure you want to close this window?", "We will miss you", JOptionPane.YES_NO_OPTION, 
+		        		JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		            System.exit(0);
+		        }
+		    }
+		});
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+		FirstScreen fs=this;
+		JMenuItem mnNewProject = new JMenuItem("New Project");
+		mnNewProject.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NewProjectDialog np=new NewProjectDialog(fs);
+				np.setVisible(true);
+		    }
+		});
+		JMenuItem mnOpenProject = new JMenuItem("Open Project");
+		mnOpenProject.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TitleScreen ts=new TitleScreen();
+				ts.setVisible(true);
+		        }
+		});
+		JMenuItem mnCloseProject = new JMenuItem("Close Project");
+		mnCloseProject.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TitleScreen ts=new TitleScreen();
+				ts.setVisible(true);
+				frame.dispose();
+		    }
+		});
+		
+		JMenuItem mnImport = new JMenuItem("Import");
+		mnImport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("ZIP","zip");
+				    chooser.setFileFilter(filter);
+				chooser.setDialogType(JFileChooser.CUSTOM_DIALOG);
+			    int returnVal = chooser.showOpenDialog(null);
+			    if(returnVal == JFileChooser.APPROVE_OPTION) {
+			    	  main.importProject(chooser.getSelectedFile().getPath());
+			    	  ProjectClass projectimport=(ProjectClass) main.deserialize(chooser.getSelectedFile().getPath().replace(".zip", "")+File.separator+"FinalProject.ser");
+			          frame.dispose();
+			          FirstScreen fs = null;
+					try {
+						fs = new FirstScreen(projectimport);
+					} catch (ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+			          fs.setVisible(true);
+			          fs.goToLoading(projectimport.getQueryList().getLast());
+			            
+			            
+			    }
+			}
+		});
+		
+		
+		JMenuItem mnExport = new JMenuItem("Export");
+		mnExport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				main.serialize(project, project.getLocation()+File.separator+project.getName()+File.separator+project.getName()+"FinalProject.ser");
+				main.makeZip(project.getLocation()+File.separator+project.getName(), project.getLocation()+File.separator+project.getName()+"-zipped.zip", project.getName());
+		    }
+		});
+		
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (JOptionPane.showConfirmDialog(null, "Are you sure you want to close this window?", "We will miss you", JOptionPane.YES_NO_OPTION, 
+		        		JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		            System.exit(0);
+		        }
+			}
+		});
+		
+		proxyDialog dialog = new proxyDialog();
+		dialog.setVisible(false);
+		
+		JMenuItem mntmProxySettings = new JMenuItem("Proxy Settings");
+		mntmProxySettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				dialog.setVisible(true);
+			}
+		});
+		
+		mnFile.add(mnNewProject);
+		mnFile.add(mnOpenProject);
+		mnFile.add(mnCloseProject);
+		mnFile.add(mnExport);
+		mnFile.add(mnImport);
+		mnFile.add(mntmProxySettings);
+		mnFile.add(mntmExit);
+		
+		JMenu mnView=new JMenu("View");
+		
+		JMenuItem mnTodo=new JMenuItem("ToDo");
+//		mnTodo.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				//Todo
+//			}
+//		});
+		
+		JMenuItem mnEventLog=new JMenuItem("Event Log");
+//		mnEventLog.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				//Todo
+//			}
+//		});
+		mnView.add(mnTodo);
+		mnView.add(mnEventLog);
+		menuBar.add(mnView);
+		
+		JMenu mnQuery=new JMenu ("Query");
+		JMenuItem mnNewQuery= new JMenuItem("New Query");
+		mnNewQuery.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				try {
+					FirstScreen f=new FirstScreen(project);
+					currentQuery=null;
+					f.setVisible(true);
+					
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		        }
+		});
+		JMenuItem mnBrowseQueries =new JMenuItem("Browse Queries");
+		mnBrowseQueries.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				QueryBrowser qb=new QueryBrowser(project,frame);
+				qb.setVisible(true);
+			}
+		});
+		mnQuery.add(mnNewQuery);
+		mnQuery.add(mnBrowseQueries);
+		menuBar.add(mnQuery);
+		
+		
+		JMenu mnHelp = new JMenu("Help");
+		menuBar.add(mnHelp);
+	
+		
+		JMenuItem mntmHowToUse = new JMenuItem("How to Use");
+		mntmHowToUse.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						java.awt.Desktop.getDesktop().browse(new URL("https://drive.google.com/open?id=1sLRErDO2D7hQyd14HdTe3awSeeeVwgpA2YUNViXIjZ0").toURI());
+					} catch (MalformedURLException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (URISyntaxException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+		mnHelp.add(mntmHowToUse);
+		
+		JMenuItem mntmContactDevelopers = new JMenuItem("Contact Developers");
+		mntmContactDevelopers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					java.awt.Desktop.getDesktop().browse(new URL("mailto:harshm121@gmail.com").toURI());
+				} catch (MalformedURLException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		mnHelp.add(mntmContactDevelopers);
+		
+		JMenu mnAbout = new JMenu("About");
+		menuBar.add(mnAbout);
+		
+//		JMenuItem mntmMeetTheDevelopers = new JMenuItem("Meet the Developers");
+//		mntmMeetTheDevelopers.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				// Open Webpage of sarangi where he will upload the project and about the team
+//				try {
+//					java.awt.Desktop.getDesktop().browse(new URL("https://www.facebook.com/harshrmaheshwari").toURI());
+//				} catch (MalformedURLException e1) {
+//					e1.printStackTrace();
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				} catch (URISyntaxException e1) {
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		mnAbout.add(mntmMeetTheDevelopers);
+		
+		JMenuItem mntmKnowMoreAbout = new JMenuItem("Know more about the application");
+		mnAbout.add(mntmKnowMoreAbout);
+		
+		panel =  new JPanel();
+		getContentPane().add(panel, BorderLayout.CENTER);
+		panel.setLayout(null);
+		
+		JLabel lblEnterDetails = new JLabel("Enter Details");
+		lblEnterDetails.setFont(new Font("Menlo", Font.PLAIN, 17));
+		lblEnterDetails.setBounds(274, 46, 186, 33);
+		panel.add(lblEnterDetails);
+		
+		JLabel lblSearchQuery = new JLabel("Search Query : ");
+		lblSearchQuery.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+		lblSearchQuery.setBounds(213, 109, 117, 21);
+		panel.add(lblSearchQuery);
+		
+		textField = new JTextField();
+		textField.setEditable(true);
+		textField.setHorizontalAlignment(SwingConstants.LEFT);
+		textField.setBounds(342, 109, 177, 21);
+		panel.add(textField);
+		textField.setColumns(10);
+		/*
+		 * 
+		 Suggestion!
+		 * 
+		 */
+		File outputDir = new File(System.getProperty("user.dir") + File.separator + "Data" );
+		try{
+			FileInputStream FIn = new FileInputStream(outputDir + File.separator + "prevSearches" + ".ser");
+			ObjectInputStream OIn = new ObjectInputStream(FIn);
+			entries = (LinkedList)OIn.readObject();
+	        OIn.close();
+	        FIn.close();
+		}catch(Exception e){
+			
+		}
+		Autocomplete autocomplete = new Autocomplete(entries, true);
+		autocomplete.setMaximumRowCount(4);
+		autocomplete.setDelimiter(Autocomplete.LINE_START_PATTERN);
+		autocomplete.setCompletionBoundary(Autocomplete.CompletionBoundary.NEWLINE);
+		autocomplete.setTextComponent(textField);
+		
+		
+		
+		JLabel lblStartYear = new JLabel("Start Date : ");
+		lblStartYear.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+		lblStartYear.setBounds(57, 201, 99, 24);
+		panel.add(lblStartYear);
+		
+		UtilDateModel model = new UtilDateModel();
+		Properties p = new Properties();
+		p.put("text.today", "Today");
+		p.put("text.month", "Month");
+		p.put("text.year", "Year");
+		JDatePanelImpl datePanel = new JDatePanelImpl(model,p);
+		JDatePickerImpl datePicker = new JDatePickerImpl(datePanel,new DateLabelFormatter());
+		datePicker.setBounds(146, 201, 165, 33);
+		panel.add(datePicker);
+		
+		
+		JLabel lblEndYear = new JLabel("End Date : ");
+		lblEndYear.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+		lblEndYear.setBounds(338, 204, 89, 19);
+		panel.add(lblEndYear);
+		
+		UtilDateModel endModel = new UtilDateModel();
+		Properties p1 = new Properties();
+		p1.put("text.today", "Today");
+		p1.put("text.month", "Month");
+		p1.put("text.year", "Year");
+		JDatePanelImpl endDatePanel = new JDatePanelImpl(endModel,p1);
+		JDatePickerImpl endDatePicker = new JDatePickerImpl(endDatePanel,new DateLabelFormatter());
+		endDatePicker.setBounds(427, 201, 165, 33);
+		panel.add(endDatePicker);
+		
+		JTextField trial =new JTextField();
+		trial.setEditable(true);
+		panel.add(trial, BorderLayout.SOUTH);
+		
+		
+		JButton btnGo = new JButton("Go!");
+		btnGo.setBounds(298, 382, 117, 29);
+		btnGo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				updateInternetStatus(true);
+				if(!isInternetReachable(false)){
+					try {
+						throw new InternetNotConnectedException();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+				else{
+					if((textField.getText()==null)||(textField.getText().equals(""))){
+						JOptionPane.showMessageDialog(null, "Query Field is Mandatory", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					else if(datePicker.getModel().getValue()==null){
+						JOptionPane.showMessageDialog(null, "Start Date is Mandatory", "Error", JOptionPane.ERROR_MESSAGE);
+					}else if(endDatePicker.getModel().getValue()==null){
+						JOptionPane.showMessageDialog(null, "End Date Field is Mandatory", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					else{
+						boolean alreadyExists=false;
+						for(String str : entries){
+							if(str.equals(textField.getText())){
+								alreadyExists=true;
+							}
+						}
+						if(!alreadyExists)
+						entries.add(textField.getText());
+						FileOutputStream FOut;
+						try{
+							FOut = new FileOutputStream(outputDir + File.separator + "prevSearches" + ".ser");
+							ObjectOutputStream OOut = new ObjectOutputStream(FOut);
+						    OOut.writeObject(entries);
+						}catch(Exception e4){
+							e4.printStackTrace();
+						}
+						//panel.setVisible(false);
+						Date startSelectedDate = (Date) datePicker.getModel().getValue();
+						Date endSelectedDate = (Date) endDatePicker.getModel().getValue();
+						DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+						startDate = df.format(startSelectedDate);
+						endDate  = df.format(endSelectedDate);
+						currentQuery=new QueryClass();
+						currentQuery.setQuery(textField.getText());
+						currentQuery.startDate=startDate;
+						currentQuery.endDate=endDate;
+						currentQuery.queryLocation=project.location+File.separator+currentQuery.getQuery().toLowerCase()+"_"+currentQuery.getStartDate()+"_"+currentQuery.getEndDate(); 
+						currentQuery.parentProject=project;
+						project.queryList.add(currentQuery);
+						File dir = new File(currentQuery.queryLocation);
+						dir.mkdir();
+						goToLoading(currentQuery);
+					}	
+			}
+			}
+		});
+		panel.add(btnGo);
+//		
+//		JButton btnDirectory = new JButton("Specify Directory");
+//		btnDirectory.setBounds(274, 294, 159, 33);
+//		panel.add(btnDirectory);
+		
+		lblInternetStatus = new JLabel("Internet Status:");
+		lblInternetStatus.setBounds(20, 543, 239, 16);
+		panel.add(lblInternetStatus);
+		updateInternetStatus(true);
+		Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+            	updateInternetStatus(false);
+            }
+        }, 0, 5000);
+
+
+	}
+	public void goToLoading(QueryClass query){
+		System.out.println("Line463");
+		System.out.println(query.getQuery());
+		System.out.println(query.getStartDate());
+		System.out.println(query.getEndDate());
+		JPanel loadingPanel=new Loading(project,query);
+		System.out.println("Line464");
+		frame.getContentPane().remove(panel);
+		System.out.println("Line465");
+		System.out.println(query.getQuery());
+		System.out.println(query.getStartDate());
+		System.out.println(query.getEndDate());
+		frame.getContentPane().add(loadingPanel, BorderLayout.CENTER);
+		System.out.println("Line467");
+		File projectListFile=new File("./projectList.ser");
+		LinkedList<ProjectClass> projectList = (LinkedList<ProjectClass>)main.deserialize(projectListFile.getPath());
+		System.out.println("Line470");
+		projectList.remove(project);
+		projectList.add(project);
+		System.out.println("Line473");
+		main.serialize(projectList,projectListFile.getPath());
+		loadingPanel.setVisible(true);
+		System.out.println("Line476");
+		frame.revalidate();
+		frame.repaint();
+		System.out.println("Line479");
+	}
+	
+	public static void updateInternetStatus(boolean showPane){
+		boolean isConnected = isInternetReachable(showPane);
+		if(isConnected){
+			lblInternetStatus.setText("Internet Status: Connected");
+		}
+		else{
+			lblInternetStatus.setText("Internet Status: Not Connected!");
+		}
+	}
+	public static boolean isInternetReachable(boolean showPane){
+		LinkedList<String> domains=new LinkedList<String>();
+		domains.add("https://www.bing.com");
+		domains.add("https://www.stackoverflow.com");
+		domains.add("https://www.yahoo.com");
+		Random randomUserAgentIndex = new Random();
+			
+        try {
+            URL url = new URL(domains.get(randomUserAgentIndex.nextInt(domains.size())));
+            HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
+            Object objData = urlConnect.getContent();
+
+        } catch (UnknownHostException e) {
+        	if(showPane)
+        		JOptionPane.showMessageDialog(null, "Error in internet Connection", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        catch (IOException e) {
+        	if(showPane)
+        		JOptionPane.showMessageDialog(null, "Error in internet Connection", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+}
+class DateLabelFormatter extends AbstractFormatter {
+
+    private String datePattern = "dd/MM/yyyy";
+    private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+    public Object stringToValue(String text) throws ParseException {
+        return dateFormatter.parseObject(text);
+    }
+
+    
+    public String valueToString(Object value) throws ParseException {
+        if (value != null) {
+            Calendar cal = (Calendar) value;
+            return dateFormatter.format(cal.getTime());
+        }
+
+        return "";
+    }
+
+}
+class InternetNotConnectedException extends Exception{
+	public InternetNotConnectedException(){
+	}
+	
+}
